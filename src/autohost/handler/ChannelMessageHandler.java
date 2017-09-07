@@ -270,7 +270,7 @@ public class ChannelMessageHandler {
 		}
 
 		if (message.equalsIgnoreCase("All players are ready")) {
-			m_client.sendMessage(lobby.channel, "All players are ready! starting...");
+			m_client.sendMessage(lobby.channel, "All players are ready! Starting...");
 			m_client.sendMessage(lobby.channel, "!mp start 5");
 			lobby.timer.stopTimer();
 			return;
@@ -508,7 +508,7 @@ public class ChannelMessageHandler {
 
 	private void handleKeys(Lobby lobby, String sender, String message) {
 		if (!lobby.type.equals("3")) {
-			m_client.sendMessage(lobby.channel, "This only is available to mania lobbies.");
+			m_client.sendMessage(lobby.channel, "This command is meant for osu!mania lobbies only.");
 			return;
 		}
 		Matcher keys = RegexUtils.matcher("keys ?(\\d+)?", message);
@@ -516,14 +516,14 @@ public class ChannelMessageHandler {
 			if (!(keys.group(1).equals(""))) {
 				lobby.keys = Integer.valueOf(keys.group(1));
 				if (!lobby.keyLimit) {
-					m_client.sendMessage(lobby.channel, "Enabled the key limiter");
+					m_client.sendMessage(lobby.channel, "Enabled the key limiter.");
 					lobby.keyLimit = true;
 				}
 				m_client.sendMessage(lobby.channel, "The new key mode is " + lobby.keys + "K");
 			} else {
 				if (lobby.keyLimit) {
 					lobby.keyLimit = false;
-					m_client.sendMessage(lobby.channel, "The key limit was disabled");
+					m_client.sendMessage(lobby.channel, "The key limit was disabled.");
 				}
 			}
 		}
@@ -532,7 +532,7 @@ public class ChannelMessageHandler {
 	private void handlePrevious(Lobby lobby, String sender) {
 		if (lobby.previousBeatmap == null) {
 			m_client.sendMessage(lobby.channel,
-					sender + " there is no beatmap in the last played. Did the lobby just get created?");
+					sender + " there is no previous beatmap, was the lobby just created?");
 
 		} else {
 			m_client.sendMessage(lobby.channel,
@@ -544,12 +544,12 @@ public class ChannelMessageHandler {
 
 	private void handleAdd(Lobby lobby, String sender, String message) {
 		if (lobby.lockAdding) {
-			m_client.sendMessage(lobby.channel, sender + " sorry, beatmap requesting is currently disabled.");
+			m_client.sendMessage(lobby.channel, "Sorry " + sender + ", beatmap requesting is currently disabled.");
 			return;
 		}
 		for (Beatmap beatmap : lobby.beatmapQueue) {
 			if (m_bot.hasAlreadyRequested(lobby, sender)) {
-				m_client.sendMessage(lobby.channel, sender + " you have already requested a beatmap!");
+				m_client.sendMessage(lobby.channel, sender + ", you have already requested a beatmap!");
 				return;
 			}
 		}
@@ -563,14 +563,14 @@ public class ChannelMessageHandler {
 			id = Integer.valueOf(mapU.group(2));
 		} else if (mapUS.matches()) {
 			m_client.sendMessage(lobby.channel, sender
-					+ " You introduced a beatmap set link, processing beatmaps... (for a direct difficulty add use the /b/ link)");
+					+ ", you introduced a beatmap set link, processing beatmaps... (for a direct difficulty add use the /b/ link)");
 			int bid = Integer.valueOf(mapUS.group(2));
 			m_bot.askForConfirmation(sender, bid, lobby);
 			return;
 		}
 		if (id == 0) {
 			m_client.sendMessage(lobby.channel,
-					sender + " Incorrect Arguments for !add. Please use the beatmap URL. !add [url]");
+					"Incorrect arguments for !add, please use the beatmap URL. !add [url]");
 			return;
 		}
 		try {
@@ -583,7 +583,7 @@ public class ChannelMessageHandler {
 				String mode = JSONUtils.silentGetString(obj, "mode");
 				if (!mode.equals(lobby.type)) {
 					m_client.sendMessage(lobby.channel,
-							sender + " That beatmap does not fit the lobby's current gamemode!");
+							sender + ", your beatmap does not fit the lobby's current gamemode!");
 					return;
 				}
 
@@ -593,7 +593,7 @@ public class ChannelMessageHandler {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (BrokenBeatmap e) {
-					m_client.sendMessage(lobby.channel,sender+ " this beatmap has invalid attributes. This may be due to being a broken beatmap. Avoiding.");
+					m_client.sendMessage(lobby.channel,sender + ", your beatmap has invalid attributes. This may be due to being a broken beatmap. Avoiding.");
 					return;
 				}
 				beatmap.RequestedBy = m_bot.getId(sender);
@@ -608,7 +608,7 @@ public class ChannelMessageHandler {
 						// not,
 						// return
 						m_client.sendMessage(lobby.channel,
-								sender + " the difficulty of the song you requested does not match the lobby criteria. "
+								sender + ", the difficulty of the song you requested does not match the lobby criteria. "
 										+ "(Lobby m/M: " + lobby.minDifficulty + "*/" + lobby.maxDifficulty + "*),"
 										+ " Song: " + beatmap.difficulty + "*");
 						return;
@@ -616,7 +616,7 @@ public class ChannelMessageHandler {
 				}
 				if (!lobby.statusTypes.get(beatmap.graveyard)) {
 					m_client.sendMessage(lobby.channel,
-							sender + " that beatmap is not within ranking criteria for this lobby! (Ranked/loved/etc)");
+							sender + ", your beatmap is not within ranking criteria for this lobby!");
 					return;
 				}
 
@@ -624,7 +624,7 @@ public class ChannelMessageHandler {
 					if (lobby.keyLimit) {
 						if (beatmap.difficulty_cs != lobby.keys) {
 							m_client.sendMessage(lobby.channel,
-									sender + " that beatmap does not have the key count this lobby uses. Lobby: "
+									sender + ", your beatmap does not share the same key count as this lobby. Lobby: "
 											+ lobby.keys + "K");
 							return;
 						}
@@ -634,15 +634,15 @@ public class ChannelMessageHandler {
 					if (beatmap.difficulty_ar > lobby.maxAR) {
 
 						m_client.sendMessage(lobby.channel,
-								sender + " That beatmap has a too high Approach Rate for this lobby! Max: "
-										+ lobby.maxAR + " beatmap AR: " + beatmap.difficulty_ar);
+								sender + ", your beatmap's Approach Rate is too high for lobby! Max AR: "
+										+ lobby.maxAR + " Beatmap AR: " + beatmap.difficulty_ar);
 						return;
 					}
 				}
 
 				if (lobby.onlyGenre) {
 					if (!beatmap.genre.equalsIgnoreCase(lobby.genre)) {
-						m_client.sendMessage(lobby.channel, sender + " This lobby is set to only play "
+						m_client.sendMessage(lobby.channel, sender + ", this lobby is set to only play "
 								+ lobby.genres[Integer.valueOf(lobby.genre)] + " genre!");
 						return;
 					}
@@ -653,7 +653,7 @@ public class ChannelMessageHandler {
 						if (Integer.valueOf(dateM.group(1)) >= lobby.maxyear
 								|| Integer.valueOf(dateM.group(1)) <= lobby.minyear) {
 							m_client.sendMessage(lobby.channel,
-									sender + " This beatmap is too old or new for this beatmap! Range: " + lobby.minyear
+									sender + ", your beatmap is too old or new for this lobby! Range: " + lobby.minyear
 											+ "-" + lobby.maxyear);
 							return;
 						}
@@ -664,7 +664,7 @@ public class ChannelMessageHandler {
 					int minutes = lobby.maxLength / 60;
 					int seconds = lobby.maxLength - (minutes * 60);
 					length = minutes + ":" + seconds;
-					m_client.sendMessage(lobby.channel, sender + " This beatmap too long! Max length is: " + length);
+					m_client.sendMessage(lobby.channel, sender + ", your beatmap is too long! Max length is: " + length);
 					return;
 				}
 				/*
@@ -685,12 +685,12 @@ public class ChannelMessageHandler {
 
 	private void handleAddDT(Lobby lobby, String sender, String message) {
 		if (lobby.lockAdding) {
-			m_client.sendMessage(lobby.channel, sender + " sorry, beatmap requesting is currently disabled.");
+			m_client.sendMessage(lobby.channel, "Sorry " + sender + ", beatmap requesting is currently disabled.");
 			return;
 		}
 		if (!lobby.isOP(m_bot.getId(sender))) {
 			if (m_bot.hasAlreadyRequested(lobby, sender)) {
-				m_client.sendMessage(lobby.channel, sender + " you have already requested a beatmap!");
+				m_client.sendMessage(lobby.channel, sender + ", you have already requested a beatmap!");
 				return;
 			}
 		}
@@ -701,7 +701,7 @@ public class ChannelMessageHandler {
 		}
 		if (id == 0) {
 			m_client.sendMessage(lobby.channel,
-					sender + " Incorrect Arguments for !adddt. Please use the beatmap URL. !adddt [url]");
+					"Incorrect arguments for !adddt, please use the beatmap URL. !adddt [url]");
 			return;
 		}
 		try {
@@ -714,7 +714,7 @@ public class ChannelMessageHandler {
 				String mode = JSONUtils.silentGetString(obj, "mode");
 				if (!mode.equals(lobby.type)) {
 					m_client.sendMessage(lobby.channel,
-							sender + " That beatmap does not fit the lobby's current gamemode!");
+							sender + ", your beatmap does not fit the lobby's current gamemode!");
 					return;
 				}
 				Beatmap beatmap = JSONUtils.silentGetBeatmap(obj);
@@ -751,7 +751,7 @@ public class ChannelMessageHandler {
 					if (!(beatmap.difficulty >= lobby.minDifficulty && beatmap.difficulty <= lobby.maxDifficulty)) { // Are
 						// we inside the criteria? if not, return
 						m_client.sendMessage(lobby.channel,
-								sender + " the difficulty of the song you requested does not match the lobby criteria. "
+								sender + ", the difficulty of the song you requested does not match the lobby's criteria. "
 										+ "(Lobby m/M: " + lobby.minDifficulty + "*/" + lobby.maxDifficulty + "*),"
 										+ " Song: " + beatmap.difficulty + "*");
 						return;
@@ -763,7 +763,7 @@ public class ChannelMessageHandler {
 						if (Integer.valueOf(dateM.group(1)) >= lobby.maxyear
 								|| Integer.valueOf(dateM.group(1)) <= lobby.minyear) {
 							m_client.sendMessage(lobby.channel,
-									sender + " This beatmap is too old or new for this beatmap! Range: " + lobby.minyear
+									sender + ", your beatmap is too old or new for this lobby! Range: " + lobby.minyear
 											+ "-" + lobby.maxyear);
 							return;
 						}
@@ -774,13 +774,13 @@ public class ChannelMessageHandler {
 					int minutes = lobby.maxLength / 60;
 					int seconds = lobby.maxLength - (minutes * 60);
 					length = minutes + ":" + seconds;
-					m_client.sendMessage(lobby.channel, sender + " This beatmap too long! Max length is: " + length);
+					m_client.sendMessage(lobby.channel, sender + ", your beatmap is too long! The max length is: " + length);
 					return;
 				}
 
 				if (!lobby.statusTypes.get(beatmap.graveyard)) {
 					m_client.sendMessage(lobby.channel,
-							sender + " That beatmap is not within ranking criteria for this lobby! (Ranked/loved/etc)");
+							sender + ", your beatmap is not within the ranking criteria for this lobby!");
 					return;
 				}
 
@@ -788,7 +788,7 @@ public class ChannelMessageHandler {
 					if (lobby.keyLimit) {
 						if (beatmap.difficulty_cs != lobby.keys) {
 							m_client.sendMessage(lobby.channel,
-									sender + " that beatmap does not have the key count this lobby uses. Lobby: "
+									sender + ", your beatmap does not share the same key count as this lobby. Lobby: "
 											+ lobby.keys + "K");
 							return;
 						}
